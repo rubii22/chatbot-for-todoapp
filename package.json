@@ -1,0 +1,23 @@
+{
+  "name": "todo-chatbot-frontend",
+  "version": "1.0.0",
+  "description": "Todo AI Chatbot Frontend with OpenAI ChatKit Integration",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "ai": "^6.0.57",
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
