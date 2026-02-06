@@ -18,6 +18,18 @@ export function useTasks(): UseTasksReturn {
 
   useEffect(() => {
     loadTasks();
+
+    // Listen for task-updated events to refresh tasks
+    const handleTaskUpdated = () => {
+      loadTasks();
+    };
+
+    window.addEventListener('task-updated', handleTaskUpdated);
+
+    // Cleanup event listener on unmount
+    return () => {
+      window.removeEventListener('task-updated', handleTaskUpdated);
+    };
   }, []);
 
   const loadTasks = async () => {

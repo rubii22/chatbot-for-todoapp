@@ -108,10 +108,14 @@ export class ConversationStateManager {
 
   // Add a message to a conversation
   addMessageToConversation(conversationId: string, message: ChatMessage): void {
-    const state = this.loadConversationState(conversationId);
+    let state = this.loadConversationState(conversationId);
+
+    // If conversation doesn't exist, create a new one
     if (!state) {
-      console.error(`Conversation ${conversationId} not found`);
-      return;
+      state = this.createNewConversation();
+      // Override the generated conversationId with the provided one
+      state.conversationId = conversationId;
+      this.saveConversationState(conversationId, state);
     }
 
     const updatedMessages = [...state.messages, message];

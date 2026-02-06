@@ -12,6 +12,18 @@ class TaskStatus(str, Enum):
     completed = "completed"
 
 
+class User(SQLModel, table=True):
+    """
+    User model for authentication
+    """
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+    email: str = Field(unique=True, index=True)
+    password_hash: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+
 class Task(SQLModel, table=True):
     """
     Task model representing user tasks with user isolation

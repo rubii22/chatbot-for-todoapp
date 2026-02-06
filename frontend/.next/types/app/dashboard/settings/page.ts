@@ -1,8 +1,8 @@
-// File: C:\Users\Dell\OneDrive\Desktop\todo-chatbot\frontend\src\app\auth\signup\page.tsx
-import * as entry from '../../../../../src/app/auth/signup/page.js'
+// File: C:\Users\Dell\OneDrive\Desktop\todo-chatbot - Copy\frontend\src\app\dashboard\settings\page.tsx
+import * as entry from '../../../../../src/app/dashboard/settings/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
-type TEntry = typeof import('../../../../../src/app/auth/signup/page.js')
+type TEntry = typeof import('../../../../../src/app/dashboard/settings/page.js')
 
 // Check that the entry is a valid entry
 checkFields<Diff<{

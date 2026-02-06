@@ -147,7 +147,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
       const data = await response.json();
 
       // Update conversation ID if new conversation was created
-      if (data.conversation_id && !conversationId) {
+      if (data.conversation_id) {
         setConversationId(data.conversation_id);
         conversationManager.setActiveConversationId(data.conversation_id);
       }
@@ -164,6 +164,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
 
       // Add to messages
       setMessages(prev => [...prev, assistantMessage]);
+
+      // Check if response indicates a task was added or created
+      if (data.response && (data.response.toLowerCase().includes('added') || data.response.toLowerCase().includes('created'))) {
+        // Dispatch task-updated event to notify dashboard
+        window.dispatchEvent(new CustomEvent('task-updated'));
+      }
 
       // Save messages to local storage
       if (data.conversation_id) {

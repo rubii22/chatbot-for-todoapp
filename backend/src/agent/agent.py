@@ -15,7 +15,7 @@ except ImportError:
     def call_tool(tool_name, **kwargs):
         # Mock implementation for testing
         return {"status": "mocked", "tool": tool_name, "params": kwargs}
-from ..db import get_session, engine
+from ..db import get_session, engine, get_conversation_history, save_message
 import asyncio
 
 
@@ -28,12 +28,15 @@ class OpenRouterAgent:
         """Initialize the OpenAI client with OpenRouter API key from environment"""
         api_key = os.getenv("OPENROUTER_API_KEY")
         if not api_key:
-            raise ValueError("OPENROUTER_API_KEY environment variable is required")
-
-        self.client = OpenAI(
-            base_url="https://openrouter.ai/api/v1",
-            api_key=api_key
-        )
+            # For development, we'll use a mock mode
+            self.client = None
+            self.mock_mode = True
+        else:
+            self.client = OpenAI(
+                base_url="https://openrouter.ai/api/v1",
+                api_key=api_key
+            )
+            self.mock_mode = False
 
         # Define the tools available to the agent in OpenAI format
         self.tools = [
@@ -174,7 +177,7 @@ class OpenRouterAgent:
             Dictionary with response, conversation_id, and tool_calls
         """
         # Get conversation history
-        conversation, messages = self._get_conversation_history(user_id, conversation_id)
+        conversation, messages = get_conversation_history(user_id, conversation_id)
 
         # Format messages for OpenAI
         openai_messages = []
@@ -199,120 +202,115 @@ class OpenRouterAgent:
             "content": message_content
         })
 
-        # Call OpenAI with tools
-        try:
-            response = self.client.chat.completions.create(
-                model="openrouter/auto",  # Using OpenRouter's auto-routing model
-                messages=openai_messages,
-                tools=self.tools,
-                tool_choice="auto",  # Let the model decide when to use tools
-                temperature=0.7
-            )
+        # Call OpenAI with tools or use mock response
+        if self.mock_mode:
+            # Mock response for development without API key
+            response_text = f"This is a mock response for: {message_content}. In production, this would connect to OpenRouter AI."
+            tool_calls = []  # No tool calls in mock mode for now
+        else:
+            try:
+                response = self.client.chat.completions.create(
+                    model="openrouter/auto",  # Using OpenRouter's auto-routing model
+                    messages=openai_messages,
+                    tools=self.tools,
+                    tool_choice="auto",  # Let the model decide when to use tools
+                    temperature=0.7
+                )
 
-            # Process tool calls if any
-            tool_calls = []
+                # Process tool calls if any
+                tool_calls = []
 
-            # Check if the response has tool calls
-            if response.choices[0].message.tool_calls:
-                for tool_call in response.choices[0].message.tool_calls:
-                    # Parse the function arguments
-                    args = json.loads(tool_call.function.arguments)
+                # Check if the response has tool calls
+                if response.choices[0].message.tool_calls:
+                    for tool_call in response.choices[0].message.tool_calls:
+                        # Parse the function arguments
+                        args = json.loads(tool_call.function.arguments)
 
-                    # Add the user_id to the arguments
-                    args['user_id'] = user_id
+                        # Add the user_id to the arguments
+                        args['user_id'] = user_id
 
-                    # Call the MCP tool
-                    result = call_tool(tool_call.function.name, **args)
+                        # Call the MCP tool
+                        result = call_tool(tool_call.function.name, **args)
 
-                    # Record the tool call
-                    tool_calls.append({
-                        "name": tool_call.function.name,
-                        "arguments": args,
-                        "result": result
-                    })
+                        # Record the tool call
+                        tool_calls.append({
+                            "name": tool_call.function.name,
+                            "arguments": args,
+                            "result": result
+                        })
 
-                    # Send the tool result back to the model for a final response
-                    openai_messages.append({
-                        "role": "tool",
-                        "tool_call_id": tool_call.id,
-                        "name": tool_call.function.name,
-                        "content": json.dumps(result)
-                    })
+                        # Send the tool result back to the model for a final response
+                        openai_messages.append({
+                            "role": "tool",
+                            "tool_call_id": tool_call.id,
+                            "name": tool_call.function.name,
+                            "content": json.dumps(result)
+                        })
 
-                # Get the final response from the model after processing tool calls
-                if tool_calls:
-                    final_response = self.client.chat.completions.create(
-                        model="openrouter/auto",
-                        messages=openai_messages,
-                        temperature=0.7
-                    )
-                    response_text = final_response.choices[0].message.content
+                    # Get the final response from the model after processing tool calls
+                    if tool_calls:
+                        final_response = self.client.chat.completions.create(
+                            model="openrouter/auto",
+                            messages=openai_messages,
+                            temperature=0.7
+                        )
+                        response_text = final_response.choices[0].message.content
+                    else:
+                        response_text = response.choices[0].message.content
+
                 else:
-                    response_text = response.choices[0].message.content
+                    # If no tool calls were made, just get the text response
+                    response_text = response.choices[0].message.content or ""
 
-            else:
-                # If no tool calls were made, just get the text response
-                response_text = response.choices[0].message.content or ""
+            except Exception as e:
+                # Handle errors gracefully
+                response_text = f"I encountered an issue processing your request: {str(e)}"
+                tool_calls = []
 
-            # Save the user message
-            self._save_message(conversation.id, MessageRole.user, message_content)
+        # Save the user message
+        save_message(conversation.id, MessageRole.user, message_content)
 
-            # Save the assistant response
-            self._save_message(conversation.id, MessageRole.assistant, response_text)
+        # Save the assistant response
+        save_message(conversation.id, MessageRole.assistant, response_text)
 
-            return {
-                "conversation_id": conversation.id,
-                "response": response_text,
-                "tool_calls": tool_calls
-            }
+        return {
+            "conversation_id": conversation.id,
+            "response": response_text,
+            "tool_calls": tool_calls
+        }
 
-        except Exception as e:
-            # Handle errors gracefully
-            error_response = f"I encountered an issue processing your request: {str(e)}"
+    # Using the functions from db.py instead of internal methods
+    # def _get_conversation_history(self, user_id: str, conversation_id: Optional[int] = None):
+    #     """Retrieve conversation history from database"""
+    #     with Session(engine) as session:
+    #         if conversation_id:
+    #             # Get existing conversation
+    #             conversation = session.get(Conversation, conversation_id)
+    #             if not conversation or conversation.user_id != user_id:
+    #                 raise ValueError("Conversation not found or does not belong to user")
+    #         else:
+    #             # Create new conversation
+    #             conversation = Conversation(user_id=user_id)
+    #             session.add(conversation)
+    #             session.commit()
+    #             session.refresh(conversation)
 
-            # Save the user message
-            self._save_message(conversation.id, MessageRole.user, message_content)
+    #         # Get all messages for this conversation
+    #         statement = select(Message).where(
+    #             Message.conversation_id == conversation.id
+    #         ).order_by(Message.created_at)
 
-            # Save the error response
-            self._save_message(conversation.id, MessageRole.assistant, error_response)
+    #         messages = session.exec(statement).all()
 
-            return {
-                "conversation_id": conversation.id,
-                "response": error_response,
-                "tool_calls": []
-            }
+    #         return conversation, messages
 
-    def _get_conversation_history(self, user_id: str, conversation_id: Optional[int] = None):
-        """Retrieve conversation history from database"""
-        with Session(engine) as session:
-            if conversation_id:
-                # Get existing conversation
-                conversation = session.get(Conversation, conversation_id)
-                if not conversation or conversation.user_id != user_id:
-                    raise ValueError("Conversation not found or does not belong to user")
-            else:
-                # Create new conversation
-                conversation = Conversation(user_id=user_id)
-                session.add(conversation)
-                session.commit()
-                session.refresh(conversation)
-
-            # Get all messages for this conversation
-            statement = select(Message).where(
-                Message.conversation_id == conversation.id
-            ).order_by(Message.created_at)
-
-            messages = session.exec(statement).all()
-
-            return conversation, messages
-
-    def _save_message(self, conversation_id: int, role: MessageRole, content: str):
-        """Save a message to the database"""
-        with Session(engine) as session:
-            message = Message(
-                conversation_id=conversation_id,
-                role=role,
-                content=content
-            )
-            session.add(message)
-            session.commit()
+    # def _save_message(self, conversation_id: int, role: MessageRole, content: str):
+    #     """Save a message to the database"""
+    #     with Session(engine) as session:
+    #         message = Message(
+    #             conversation_id=conversation_id,
+    #             role=role,
+    #             content=content
+    #         )
+    #         session.add(message)
+    #         session.commit()
