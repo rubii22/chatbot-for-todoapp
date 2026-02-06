@@ -1,58 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import './chatbot.css';
 
 interface ChatbotButtonProps {
   onClick: () => void;
-  hasUnread?: boolean;
 }
 
-const ChatbotButton: React.FC<ChatbotButtonProps> = ({ onClick, hasUnread = false }) => {
-  const [isVisible, setIsVisible] = useState(true);
-
-  // Handle scroll to hide/show button as needed
-  useEffect(() => {
-    const handleScroll = () => {
-      // You can customize this logic based on your needs
-      // For now, keeping the button always visible
-      setIsVisible(true);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  if (!isVisible) {
-    return null;
-  }
-
+const ChatbotButton: React.FC<ChatbotButtonProps> = ({ onClick }) => {
   return (
-    <div className="chatbot-container" role="presentation">
+    <div className="chatbot-container">
       <button
-        className={`chatbot-button ${hasUnread ? 'unread' : ''}`}
+        className="chatbot-button"
         onClick={onClick}
-        aria-label={hasUnread ? "Open chat, unread messages" : "Open chat"}
-        title={hasUnread ? "Open chat, unread messages" : "Open chat"}
+        aria-label="Open AI Assistant"
+        title="Chat with AI Assistant"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" role="img" aria-label="Chat icon">
-          <path d="M12 2C6.48 2 2 6.48 2 12C2 13.58 2.36 15.07 3.02 16.4L2 22L7.6 20.97C8.93 21.64 10.42 22 12 22C17.52 22 22 17.52 22 12S17.52 2 12 2ZM12 20C8.69 20 6 17.31 6 14S8.69 8 12 8 18 10.69 18 14 15.31 20 12 20ZM13 9H11V13H7V15H11V19H13V15H17V13H13V9Z" />
+        {/* Professional AI Chat Icon */}
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          className="chatbot-icon"
+        >
+          {/* Chat bubble with sparkle/AI indicator */}
+          <path
+            d="M12 2C6.48 2 2 6.48 2 12C2 13.93 2.6 15.72 3.62 17.19L2.05 21.95L6.81 20.38C8.28 21.4 10.07 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2Z"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="rgba(255, 255, 255, 0.1)"
+          />
+          {/* AI Sparkle/Star */}
+          <path
+            d="M12 7L12.9 9.9L15 11L12.9 12.1L12 15L11.1 12.1L9 11L11.1 9.9L12 7Z"
+            fill="currentColor"
+          />
+          <circle cx="8" cy="11" r="0.8" fill="currentColor" />
+          <circle cx="16" cy="11" r="0.8" fill="currentColor" />
         </svg>
-        {hasUnread && (
-          <span
-            className="unread-indicator"
-            style={{
-              position: 'absolute',
-              top: '0',
-              right: '0',
-              width: '12px',
-              height: '12px',
-              backgroundColor: '#ef4444',
-              borderRadius: '50%',
-              border: '2px solid white'
-            }}
-            aria-label="unread message indicator"
-            role="status"
-          ></span>
-        )}
+
+        {/* Notification badge (optional - can be used for unread messages) */}
+        <span className="chatbot-badge" style={{ display: 'none' }}>
+          <span className="chatbot-badge-pulse"></span>
+        </span>
       </button>
     </div>
   );

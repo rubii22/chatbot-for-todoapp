@@ -1,4 +1,4 @@
-/* Glassmorphism styling for chatbot components */
+/* Professional Glassmorphism styling for chatbot components */
 
 .chatbot-container {
   position: fixed;
@@ -8,10 +8,10 @@
 }
 
 .chatbot-button {
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(147, 51, 234, 0.3) 100%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -19,33 +19,85 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  box-shadow: 0 8px 32px 0 rgba(59, 130, 246, 0.4);
   transition: all 0.3s ease;
+  position: relative;
+  color: white;
 }
 
 .chatbot-button:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.5) 0%, rgba(147, 51, 234, 0.5) 100%);
+  transform: scale(1.1);
+  box-shadow: 0 12px 40px 0 rgba(59, 130, 246, 0.6);
+}
+
+.chatbot-button:active {
   transform: scale(1.05);
 }
 
-.chatbot-button svg {
-  width: 24px;
-  height: 24px;
-  fill: white;
+.chatbot-icon {
+  width: 28px;
+  height: 28px;
+  color: white;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.chatbot-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 12px;
+  height: 12px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid rgba(20, 20, 20, 0.95);
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+.chatbot-badge-pulse {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background: #ef4444;
+  border-radius: 50%;
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes badge-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
 }
 
 .chatbot-window {
   position: fixed;
   bottom: 90px;
   right: 20px;
-  width: 400px;
-  height: 500px;
-  background: rgba(30, 30, 30, 0.8);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 420px;
+  height: 600px;
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  box-shadow: 0 20px 60px 0 rgba(0, 0, 0, 0.5);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -63,8 +115,8 @@
 }
 
 .chatbot-header {
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.2);
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.3);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
   justify-content: space-between;
@@ -75,79 +127,189 @@
   margin: 0;
   color: white;
   font-size: 16px;
+  font-weight: 600;
 }
 
 .chatbot-close {
-  background: none;
-  border: none;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
   cursor: pointer;
-  font-size: 18px;
-  padding: 4px;
+  font-size: 24px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  line-height: 1;
+}
+
+.chatbot-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
 }
 
 .chatbot-messages {
   flex: 1;
-  padding: 16px;
+  padding: 20px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+.chatbot-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chatbot-messages::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
 .chatbot-input-area {
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.2);
+  padding: 16px 20px;
+  background: rgba(0, 0, 0, 0.3);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .chatbot-input {
   flex: 1;
   padding: 12px 16px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, 0.1);
   color: white;
   outline: none;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.chatbot-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .chatbot-input:focus {
   border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.chatbot-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .chatbot-send-button {
   padding: 12px 16px;
   border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(59, 130, 246, 0.3);
   color: white;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
 }
 
-.chatbot-send-button:hover {
-  background: rgba(255, 255, 255, 0.2);
+.chatbot-send-button:hover:not(:disabled) {
+  background: rgba(59, 130, 246, 0.5);
+  transform: scale(1.05);
+}
+
+.chatbot-send-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .message {
-  max-width: 80%;
+  max-width: 85%;
   padding: 12px 16px;
-  border-radius: 16px;
+  border-radius: 12px;
   word-wrap: break-word;
+  color: white;
+  font-size: 14px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .message.user {
   align-self: flex-end;
-  background: rgba(59, 130, 246, 0.3);
-  border: 1px solid rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.25);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 12px 12px 4px 12px;
 }
 
 .message.assistant {
   align-self: flex-start;
-  background: rgba(107, 114, 128, 0.3);
-  border: 1px solid rgba(107, 114, 128, 0.4);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px 12px 12px 4px;
+}
+
+.message-content {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Markdown styling within messages */
+.message-content p {
+  margin: 0;
+}
+
+.message-content ul,
+.message-content ol {
+  margin: 4px 0;
+  padding-left: 20px;
+}
+
+.message-content li {
+  margin: 2px 0;
+}
+
+.message-content strong {
+  font-weight: 600;
+  color: white;
+}
+
+.message-content code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.message-content pre {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 12px;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 8px 0;
+}
+
+.message-content pre code {
+  background: none;
+  padding: 0;
+}
+
+.message-status {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 4px;
 }
 
 .loading-indicator {
@@ -167,7 +329,22 @@
 @media (max-width: 768px) {
   .chatbot-window {
     width: calc(100% - 40px);
-    height: calc(100% - 40px);
+    height: calc(100% - 120px);
+    bottom: 20px;
+    right: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chatbot-window {
+    width: 100%;
+    height: 100%;
+    bottom: 0;
+    right: 0;
+    border-radius: 0;
+  }
+  
+  .chatbot-button {
     bottom: 20px;
     right: 20px;
   }

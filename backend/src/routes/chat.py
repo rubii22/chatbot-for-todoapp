@@ -2,6 +2,7 @@
 Chat endpoint for the Todo AI Chatbot
 Handles POST /api/{user_id}/chat requests
 """
+
 from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
@@ -37,7 +38,9 @@ def verify_token(token: str) -> Dict[str, Any]:
     """
     secret = os.getenv("BETTER_AUTH_SECRET")
     if not secret:
-        raise HTTPException(status_code=500, detail="Server configuration error: auth secret not set")
+        raise HTTPException(
+            status_code=500, detail="Server configuration error: auth secret not set"
+        )
 
     try:
         # Decode the token
@@ -45,7 +48,7 @@ def verify_token(token: str) -> Dict[str, Any]:
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.JWTError:
+    except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
@@ -60,13 +63,14 @@ def get_current_user_optional(request: Request) -> str:
         try:
             import jwt
             import os
+
             secret = os.getenv("BETTER_AUTH_SECRET")
             if secret:
                 payload = jwt.decode(token, secret, algorithms=["HS256"])
                 user_id = payload.get("user_id") or payload.get("sub")
                 if user_id:
                     return str(user_id)
-        except (jwt.ExpiredSignatureError, jwt.JWTError):
+        except (jwt.ExpiredSignatureError, jwt.PyJWTError):
             pass
 
     # Return a default user ID for development
@@ -77,7 +81,7 @@ def get_current_user_optional(request: Request) -> str:
 async def chat_endpoint(
     user_id: str,
     request: ChatRequest,
-    current_user: str = Depends(get_current_user_optional)
+    current_user: str = Depends(get_current_user_optional),
 ):
     """
     Chat endpoint that processes user messages through the OpenRouter AI agent
@@ -102,7 +106,7 @@ async def chat_endpoint(
         result = agent.process_message(
             user_id=verified_user_id,
             message_content=request.message,
-            conversation_id=request.conversation_id
+            conversation_id=request.conversation_id,
         )
 
         # Format tool calls if they exist
@@ -114,8 +118,10 @@ async def chat_endpoint(
                     "type": "function",
                     "function": {
                         "name": tc["name"],
-                        "arguments": __import__('json').dumps(tc.get("args", tc.get("arguments", {})))
-                    }
+                        "arguments": __import__("json").dumps(
+                            tc.get("args", tc.get("arguments", {}))
+                        ),
+                    },
                 }
                 for tc in result["tool_calls"]
             ]
@@ -124,7 +130,7 @@ async def chat_endpoint(
         return {
             "response": result.get("response", "Got your message!"),
             "conversation_id": result["conversation_id"],
-            "tool_calls": formatted_tool_calls
+            "tool_calls": formatted_tool_calls,
         }
 
     except ValueError as e:

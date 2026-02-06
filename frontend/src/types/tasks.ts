@@ -4,7 +4,7 @@ export interface Task {
   description?: string;
   completed: boolean;
   userId: string;
-  createdAt: string;
+  created_at: string;
   updatedAt: string;
 }
 

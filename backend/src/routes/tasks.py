@@ -2,6 +2,7 @@
 Task endpoints for the Todo AI Chatbot
 Handles CRUD operations for tasks
 """
+
 from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
@@ -46,7 +47,9 @@ def verify_token(token: str) -> Dict[str, Any]:
     """
     secret = os.getenv("BETTER_AUTH_SECRET")
     if not secret:
-        raise HTTPException(status_code=500, detail="Server configuration error: auth secret not set")
+        raise HTTPException(
+            status_code=500, detail="Server configuration error: auth secret not set"
+        )
 
     try:
         # Decode the token
@@ -54,7 +57,7 @@ def verify_token(token: str) -> Dict[str, Any]:
         return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
-    except jwt.JWTError:
+    except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
@@ -70,7 +73,9 @@ async def get_current_user(request: Request) -> str:
     """
     auth_header = request.headers.get("Authorization")
     if not auth_header or not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Authorization header missing or invalid")
+        raise HTTPException(
+            status_code=401, detail="Authorization header missing or invalid"
+        )
 
     token = auth_header.split(" ")[1]
     payload = verify_token(token)
@@ -94,13 +99,14 @@ def get_current_user_optional(request: Request) -> str:
         try:
             import jwt
             import os
+
             secret = os.getenv("BETTER_AUTH_SECRET")
             if secret:
                 payload = jwt.decode(token, secret, algorithms=["HS256"])
                 user_id = payload.get("user_id") or payload.get("sub")
                 if user_id:
                     return str(user_id)
-        except (jwt.ExpiredSignatureError, jwt.JWTError):
+        except (jwt.ExpiredSignatureError, jwt.PyJWTError):
             pass
 
     # Return a default user ID for development
@@ -109,8 +115,7 @@ def get_current_user_optional(request: Request) -> str:
 
 @router.get("/tasks/")
 async def get_tasks(
-    request: Request,
-    current_user: str = Depends(get_current_user_optional)
+    request: Request, current_user: str = Depends(get_current_user_optional)
 ):
     """
     Get all tasks for the current user
@@ -134,13 +139,14 @@ async def get_tasks(
         return {"tasks": result}
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve tasks: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to retrieve tasks: {str(e)}"
+        )
 
 
 @router.post("/tasks/")
 async def create_task(
-    request: CreateTaskRequest,
-    current_user: str = Depends(get_current_user_optional)
+    request: CreateTaskRequest, current_user: str = Depends(get_current_user_optional)
 ):
     """
     Create a new task for the current user
@@ -160,7 +166,7 @@ async def create_task(
             "add_task",
             user_id=user_id,
             title=request.title,
-            description=request.description
+            description=request.description,
         )
 
         if isinstance(result, dict) and "error" in result:
@@ -183,7 +189,7 @@ async def create_task(
             "description": request.description,
             "status": "pending",
             "created_at": "",
-            "updated_at": ""
+            "updated_at": "",
         }
 
     except Exception as e:
@@ -194,7 +200,7 @@ async def create_task(
 async def update_task(
     task_id: int,
     request: UpdateTaskRequest,
-    current_user: str = Depends(get_current_user_optional)
+    current_user: str = Depends(get_current_user_optional),
 ):
     """
     Update an existing task for the current user
@@ -211,10 +217,7 @@ async def update_task(
 
     try:
         # Prepare arguments for update
-        update_args = {
-            "user_id": user_id,
-            "task_id": task_id
-        }
+        update_args = {"user_id": user_id, "task_id": task_id}
 
         if request.title is not None:
             update_args["title"] = request.title
@@ -244,7 +247,7 @@ async def update_task(
             "description": request.description,
             "status": "pending",
             "created_at": "",
-            "updated_at": ""
+            "updated_at": "",
         }
 
     except Exception as e:
@@ -253,8 +256,7 @@ async def update_task(
 
 @router.delete("/tasks/{task_id}")
 async def delete_task(
-    task_id: int,
-    current_user: str = Depends(get_current_user_optional)
+    task_id: int, current_user: str = Depends(get_current_user_optional)
 ):
     """
     Delete a task for the current user
@@ -283,8 +285,7 @@ async def delete_task(
 
 @router.patch("/tasks/{task_id}/complete")
 async def complete_task(
-    task_id: int,
-    current_user: str = Depends(get_current_user_optional)
+    task_id: int, current_user: str = Depends(get_current_user_optional)
 ):
     """
     Mark a task as completed
@@ -322,8 +323,10 @@ async def complete_task(
             "description": "",
             "status": "completed",
             "created_at": "",
-            "updated_at": ""
+            "updated_at": "",
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to complete task: {str(e)}")
+        raise HTTPException(
+            status_code=500, detail=f"Failed to complete task: {str(e)}"
+        )

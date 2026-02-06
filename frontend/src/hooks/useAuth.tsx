@@ -3,7 +3,7 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
 import { User, AuthState } from '@/types/auth';
 import { apiClient } from '@/lib/api';
-import { getAuthToken, setAuthToken, removeAuthToken, validateToken } from '@/lib/auth';
+import { removeAuthToken, setAuthToken, validateToken } from '@/lib/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -95,8 +95,12 @@ export function AuthProvider({ children }: { children: ReactNode; }) {
     try {
       await apiClient.post('/auth/signup', { name, email, password });
 
-      // After signup, login automatically
-      await login(email, password);
+      // Successfully created account - don't auto-login
+      setAuthState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: null,
+      }));
     } catch (error) {
       setAuthState(prev => ({
         ...prev,

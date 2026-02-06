@@ -17,63 +17,53 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-br from-black to-[#111111] overflow-hidden">
-        {/* Floating Spheres Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Metallic gray spheres with subtle white highlight for metallic shine */}
-          <div className="absolute rounded-full w-24 h-24 top-1/5 left-1/6 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-md animate-float1 scale-100 hover:scale-105" />
-          <div className="absolute rounded-full w-32 h-32 top-2/3 left-1/4 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-lg animate-float2 scale-100 hover:scale-105" />
-          <div className="absolute rounded-full w-20 h-20 top-1/3 left-3/4 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-md animate-float3 scale-100 hover:scale-105" />
-          <div className="absolute rounded-full w-28 h-28 top-3/4 left-3/5 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-lg animate-float4 scale-100 hover:scale-105" />
-          <div className="absolute rounded-full w-26 h-26 top-1/4 left-2/5 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-md animate-float5 scale-100 hover:scale-105" />
-          <div className="absolute rounded-full w-30 h-30 top-2/5 left-4/5 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-lg animate-float6 scale-100 hover:scale-105" />
+      <div className="relative flex justify-center items-center bg-gradient-to-br from-black to-[#111111] overflow-hidden">
+        {/* Minimal Background - 3 spheres */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="top-1/4 left-1/6 absolute bg-gradient-to-br from-[#333333] to-[#888888] opacity-30 shadow-lg blur-lg border border-white/10 rounded-full w-32 h-32 animate-float1" />
+          <div className="top-2/3 left-3/4 absolute bg-gradient-to-br from-[#333333] to-[#888888] opacity-30 shadow-lg blur-md border border-white/10 rounded-full w-24 h-24 animate-float2" />
+          <div className="top-1/2 left-1/2 absolute bg-gradient-to-br from-[#333333] to-[#888888] opacity-20 shadow-lg blur-lg border border-white/10 rounded-full w-28 h-28 animate-float3" />
         </div>
-        <div className="text-white text-2xl">Loading...</div>
+
+        <div className="z-10 relative flex flex-col items-center gap-4">
+          <div className="border-4 border-white/20 border-t-white rounded-full w-12 h-12 animate-spin"></div>
+          <p className="text-white text-lg">Loading...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-black to-[#111111] overflow-hidden">
-      {/* Floating Spheres Background */}
-      <div className="absolute inset-0 overflow-hidden">
-        {/* Metallic gray spheres with subtle white highlight for metallic shine */}
-        <div className="absolute rounded-full w-24 h-24 top-1/5 left-1/6 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-md animate-float1 scale-100 hover:scale-105" />
-        <div className="absolute rounded-full w-32 h-32 top-2/3 left-1/4 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-lg animate-float2 scale-100 hover:scale-105" />
-        <div className="absolute rounded-full w-20 h-20 top-1/3 left-3/4 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-md animate-float3 scale-100 hover:scale-105" />
-        <div className="absolute rounded-full w-28 h-28 top-3/4 left-3/5 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-lg animate-float4 scale-100 hover:scale-105" />
-        <div className="absolute rounded-full w-26 h-26 top-1/4 left-2/5 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-md animate-float5 scale-100 hover:scale-105" />
-        <div className="absolute rounded-full w-30 h-30 top-2/5 left-4/5 opacity-50 bg-gradient-to-br from-[#333333] to-[#888888] border border-white/10 shadow-lg blur-lg animate-float6 scale-100 hover:scale-105" />
-      </div>
+    <div className="relative bg-gradient-to-br from-black to-[#111111] overflow-hidden">
 
       {/* Main Content */}
-      <div className="relative z-10 min-h-screen flex flex-col">
+      <div className="z-10 relative flex flex-col">
         {/* Hero Section */}
-        <div className="flex-grow flex items-center justify-center p-4">
+        <div className="flex flex-grow justify-center items-center p-4 sm:p-6 lg:p-8">
           <div className="w-full max-w-md md:max-w-lg lg:max-w-xl">
-            {/* Center frosted glass card */}
-            <div className="bg-[#000000]/25 backdrop-blur-xl border border-gray-700/30 rounded-3xl shadow-2xl p-8 md:p-10 text-center">
-              <h1 className="text-5xl font-bold text-white mb-4">
-                Welcome to Todo App
+            {/* Center Card */}
+            <div className="bg-[#000000]/25 shadow-2xl backdrop-blur-xl p-6 sm:p-8 md:p-10 border border-gray-700/30 rounded-2xl text-center">
+              <h1 className="mb-4 font-bold text-white text-4xl sm:text-5xl md:text-6xl">
+                Todo App
               </h1>
-              <p className="mt-4 text-xl text-gray-300 max-w-2xl mx-auto">
-                Organize your tasks effortlessly and stay productive every day!
+              <p className="mx-auto mt-4 max-w-2xl text-gray-300 text-base sm:text-lg md:text-xl">
+                Organize your tasks effortlessly and stay productive every day
               </p>
 
-              <div className="mt-8 flex flex-col sm:flex-row justify-center gap-4">
+              <div className="flex sm:flex-row flex-col justify-center gap-4 mt-8">
                 <Link href="/auth/signup">
                   <button
                     type="button"
-                    className="w-full sm:w-auto px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg font-bold text-white bg-gradient-to-r from-[#222222] to-[#444444] hover:from-[#444444] hover:to-[#666666] hover:scale-105 hover:shadow-glow transition-all duration-300"
+                    className="bg-gradient-to-r from-[#222222] hover:from-[#333333] to-[#444444] hover:to-[#555555] hover-shadow-glow px-6 md:px-8 py-3 md:py-4 rounded-lg w-full sm:w-auto font-semibold text-white text-base md:text-lg transition-all duration-300 hover-scale"
                   >
-                    Sign Up
+                    Get Started
                   </button>
                 </Link>
 
                 <Link href="/auth/login">
                   <button
                     type="button"
-                    className="w-full sm:w-auto px-6 py-3 md:px-8 md:py-4 rounded-lg text-base md:text-lg font-bold text-white bg-gradient-to-r from-[#222222] to-[#444444] hover:from-[#444444] hover:to-[#666666] hover:scale-105 hover:shadow-glow transition-all duration-300"
+                    className="hover:bg-white/10 px-6 md:px-8 py-3 md:py-4 border-2 border-white/30 hover:border-white/50 rounded-lg w-full sm:w-auto font-semibold text-white text-base md:text-lg transition-all duration-300 hover-scale"
                   >
                     Sign In
                   </button>
@@ -84,84 +74,49 @@ export default function HomePage() {
         </div>
 
         {/* Feature Cards Section */}
-        <div className="pb-12 px-4">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="px-4 sm:px-6 lg:px-8 pb-12 lg:pb-16">
+          <div className="gap-4 sm:gap-6 grid grid-cols-1 md:grid-cols-3 mx-auto max-w-6xl">
             {/* Smart Organization Card */}
-            <div className="bg-black/15 backdrop-blur-lg border border-gray-800/30 rounded-xl shadow-lg p-6 text-center">
-              <h3 className="text-xl font-bold text-white mb-2">Smart Organization</h3>
-              <p className="text-gray-300">
-                Intelligent categorization and prioritization of your tasks.
+            <div className="bg-black/15 hover:bg-black/20 shadow-lg backdrop-blur-lg p-5 sm:p-6 border border-gray-800/30 rounded-xl text-center transition-all duration-300">
+              <div className="flex justify-center items-center bg-gradient-to-br from-[#444444] to-[#666666] mx-auto mb-4 rounded-lg w-12 h-12">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+              </div>
+              <h3 className="mb-2 font-semibold text-white text-lg sm:text-xl">Smart Organization</h3>
+              <p className="text-gray-300 text-sm sm:text-base">
+                Intelligent categorization and prioritization of your tasks
               </p>
             </div>
 
             {/* Cross-Device Sync Card */}
-            <div className="bg-black/15 backdrop-blur-lg border border-gray-800/30 rounded-xl shadow-lg p-6 text-center">
-              <h3 className="text-xl font-bold text-white mb-2">Cross-Device Sync</h3>
-              <p className="text-gray-300">
-                Access your tasks from anywhere, on any device.
+            <div className="bg-black/15 hover:bg-black/20 shadow-lg backdrop-blur-lg p-5 sm:p-6 border border-gray-800/30 rounded-xl text-center transition-all duration-300">
+              <div className="flex justify-center items-center bg-gradient-to-br from-[#444444] to-[#666666] mx-auto mb-4 rounded-lg w-12 h-12">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              </div>
+              <h3 className="mb-2 font-semibold text-white text-lg sm:text-xl">Cross-Device Sync</h3>
+              <p className="text-gray-300 text-sm sm:text-base">
+                Access your tasks from anywhere, on any device
               </p>
             </div>
 
             {/* Secure & Private Card */}
-            <div className="bg-black/15 backdrop-blur-lg border border-gray-800/30 rounded-xl shadow-lg p-6 text-center">
-              <h3 className="text-xl font-bold text-white mb-2">Secure & Private</h3>
-              <p className="text-gray-300">
-                Military-grade encryption to keep your data safe.
+            <div className="bg-black/15 hover:bg-black/20 shadow-lg backdrop-blur-lg p-5 sm:p-6 border border-gray-800/30 rounded-xl text-center transition-all duration-300">
+              <div className="flex justify-center items-center bg-gradient-to-br from-[#444444] to-[#666666] mx-auto mb-4 rounded-lg w-12 h-12">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h3 className="mb-2 font-semibold text-white text-lg sm:text-xl">Secure & Private</h3>
+              <p className="text-gray-300 text-sm sm:text-base">
+                Your data is encrypted and protected at all times
               </p>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Custom CSS for animations */}
-      <style jsx global>{`
-        @keyframes float1 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          25% { transform: translate(20px, 20px) scale(1.05); }
-          50% { transform: translate(0, 20px) scale(1.03); }
-          75% { transform: translate(-20px, 10px) scale(1.04); }
-        }
-        @keyframes float2 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          25% { transform: translate(-15px, -15px) scale(1.04); }
-          50% { transform: translate(-20px, 0) scale(1.02); }
-          75% { transform: translate(10px, -20px) scale(1.05); }
-        }
-        @keyframes float3 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          25% { transform: translate(25px, -10px) scale(1.03); }
-          50% { transform: translate(15px, 25px) scale(1.04); }
-          75% { transform: translate(-10px, 15px) scale(1.02); }
-        }
-        @keyframes float4 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          25% { transform: translate(-20px, 25px) scale(1.05); }
-          50% { transform: translate(25px, -20px) scale(1.03); }
-          75% { transform: translate(0, -15px) scale(1.04); }
-        }
-        @keyframes float5 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          25% { transform: translate(15px, -25px) scale(1.02); }
-          50% { transform: translate(-25px, -15px) scale(1.04); }
-          75% { transform: translate(-15px, 25px) scale(1.03); }
-        }
-        @keyframes float6 {
-          0%, 100% { transform: translate(0, 0) scale(1); }
-          25% { transform: translate(-25px, 15px) scale(1.05); }
-          50% { transform: translate(20px, 25px) scale(1.02); }
-          75% { transform: translate(25px, -10px) scale(1.04); }
-        }
-
-        .animate-float1 { animation: float1 17s ease-in-out infinite; }
-        .animate-float2 { animation: float2 19s ease-in-out infinite; }
-        .animate-float3 { animation: float3 21s ease-in-out infinite; }
-        .animate-float4 { animation: float4 23s ease-in-out infinite; }
-        .animate-float5 { animation: float5 18s ease-in-out infinite; }
-        .animate-float6 { animation: float6 20s ease-in-out infinite; }
-
-        .hover\\:scale-105:hover { transform: scale(1.05); }
-        .hover\\:shadow-glow:hover { box-shadow: 0 0 20px rgba(100, 100, 100, 0.5); }
-      `}</style>
     </div>
   );
 }

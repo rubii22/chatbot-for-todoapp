@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { AuthWrapper } from './auth-wrapper';
 import { ConversationStateManager } from './conversation-state';
 import './chatbot.css';
@@ -63,11 +65,12 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
   };
 
   const sendMessage = async () => {
-    if (!inputValue.trim()) return;
+    if (!inputValue.trim() || isLoading) return; // Prevent sending while loading
 
+    const messageContent = inputValue.trim();
     const userMessage: ChatMessage = {
       id: crypto.randomUUID(),
-      content: inputValue,
+      content: messageContent,
       sender: 'user',
       timestamp: new Date(),
       conversationId: conversationId || '',
@@ -78,6 +81,7 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
     setMessages(prev => [...prev, userMessage]);
     setInputValue('');
     setIsLoading(true);
+    setError(null); // Clear previous errors
 
     try {
       // Get auth token
@@ -85,8 +89,6 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
 
       // Check if we're dealing with a guest user and no token exists
       if (userId === 'guest' && !token) {
-        // For guest users without auth, we might need to handle differently
-        // or show a message that they need to log in for full functionality
         console.warn('Guest user attempting to use chat - authentication required');
       }
 
@@ -103,10 +105,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(token ? { 'Authorization': `Bearer ${token}` } : {}), // Only add auth header if token exists
+          ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
         body: JSON.stringify({
-          message: inputValue,
+          message: messageContent,
           conversation_id: conversationId,
           user_id: userId
         }),
@@ -129,13 +131,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
       }
 
       if (!response.ok) {
-        // Handle different error statuses
         if (response.status === 401) {
-          // Unauthorized - user needs to log in
           setError('Please log in to use the chatbot');
           throw new Error('Authentication required');
         } else if (response.status === 403) {
-          // Forbidden - user doesn't have access
           setError('Access denied. Please check your permissions.');
           throw new Error('Access denied');
         } else {
@@ -162,8 +161,13 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
         status: 'delivered'
       };
 
-      // Add to messages
-      setMessages(prev => [...prev, assistantMessage]);
+      // Update user message status to sent and add assistant message
+      setMessages(prev => {
+        const updated = prev.map(msg =>
+          msg.id === userMessage.id ? { ...msg, status: 'sent' as const } : msg
+        );
+        return [...updated, assistantMessage];
+      });
 
       // Check if response indicates a task was added or created
       if (data.response && (data.response.toLowerCase().includes('added') || data.response.toLowerCase().includes('created'))) {
@@ -207,7 +211,10 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
   return (
     <div className={`chatbot-window ${isFullscreen ? 'fullscreen' : ''}`} role="dialog" aria-modal="true" aria-labelledby="chat-window-title">
       <div className="chatbot-header">
-        <h3 id="chat-window-title">AI Assistant</h3>
+        <div className="flex items-center gap-2">
+          <div className="bg-green-400 rounded-full w-2 h-2 animate-pulse"></div>
+          <h3 id="chat-window-title" className="font-semibold">AI Assistant</h3>
+        </div>
         <button className="chatbot-close" onClick={handleClose} aria-label="Close chat">
           ×
         </button>
@@ -216,7 +223,11 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
       <div className="chatbot-messages" role="log" aria-live="polite">
         {messages.length === 0 && !isLoading && (
           <div className="message assistant" role="status" aria-live="polite">
-            Hello! How can I help you manage your tasks today?
+            <div className="message-content">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                👋 **Hello!** How can I help you manage your tasks today?
+              </ReactMarkdown>
+            </div>
           </div>
         )}
 
@@ -226,26 +237,62 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
             className={`message ${message.sender}`}
             aria-label={`${message.sender} said: ${message.content}`}
           >
-            {message.content}
+            <div className="message-content">
+              {message.sender === 'assistant' ? (
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  components={{
+                    // Custom styling for markdown elements
+                    p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                    ul: ({ children }) => <ul className="space-y-1 mb-2 list-disc list-inside">{children}</ul>,
+                    ol: ({ children }) => <ol className="space-y-1 mb-2 list-decimal list-inside">{children}</ol>,
+                    li: ({ children }) => <li className="ml-2">{children}</li>,
+                    strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
+                    em: ({ children }) => <em className="italic">{children}</em>,
+                    code: ({ children }) => <code className="bg-white/10 px-1.5 py-0.5 rounded font-mono text-sm">{children}</code>,
+                    pre: ({ children }) => <pre className="bg-white/10 mb-2 p-3 rounded-lg overflow-x-auto">{children}</pre>,
+                  }}
+                >
+                  {message.content}
+                </ReactMarkdown>
+              ) : (
+                <span>{message.content}</span>
+              )}
+            </div>
             {message.status === 'sending' && (
-              <span className="loading-indicator" aria-label="Sending message"></span>
+              <span className="mt-1 text-gray-400 text-xs message-status">Sending...</span>
+            )}
+            {message.status === 'error' && (
+              <span className="mt-1 text-red-400 text-xs message-status">Failed to send</span>
             )}
           </div>
         ))}
 
         {isLoading && (
           <div className="message assistant" role="status" aria-live="assertive">
-            <span className="loading-indicator" aria-label="Loading response"></span>
+            <div className="flex items-center gap-2">
+              <div className="flex gap-1">
+                <div className="bg-gray-400 rounded-full w-2 h-2 animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="bg-gray-400 rounded-full w-2 h-2 animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="bg-gray-400 rounded-full w-2 h-2 animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+              <span className="text-gray-400 text-sm">AI is thinking...</span>
+            </div>
           </div>
         )}
 
         {error && (
           <div
-            style={{ padding: '10px', backgroundColor: 'rgba(239, 68, 68, 0.2)', color: '#f87171' }}
+            className="bg-red-500/20 mx-4 my-2 px-4 py-3 border border-red-500/30 rounded-lg text-red-200"
             role="alert"
             aria-live="assertive"
           >
-            {error}
+            <div className="flex items-start gap-2">
+              <svg className="flex-shrink-0 mt-0.5 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-sm">{error}</span>
+            </div>
           </div>
         )}
 
@@ -271,7 +318,16 @@ const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, userId, apiUrl
           disabled={isLoading || !inputValue.trim()}
           aria-label="Send message"
         >
-          Send
+          {isLoading ? (
+            <svg className="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+          ) : (
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+            </svg>
+          )}
         </button>
       </div>
     </div>

@@ -1,6 +1,8 @@
 # Python
 node_modules/
 frontend/node_modules/
+.next/
+frontend/.next/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -30,7 +32,6 @@ htmlcov/
 .nyc_output/
 istanbul/
 .pydev_log.*
-
 # Virtual Environment
 venv/
 env/
